@@ -1,0 +1,10 @@
+/build/
+/dist/
+/debug/
+/nbproject/
+/queuelogs/
+/Makefile
+/*.log
+/*.yml
+/defmplabxtrace.log.inx
+/.DS_Store
