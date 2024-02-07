@@ -7,7 +7,7 @@
   * 
   *     EUSART          - pin3  TX  debugger serial
   * 
-  *     BOOST_5V_IN     - pin5  RC5 Input IOC.positive
+  *     BOOST_5V_IN     - pin5  RC5 Input IRQ.rise edge  P.D.100k
   *     CHARGE_LED_RED  - pin6  RC4 Output
   *     BOOST5V_SW      - pin7  RC3 Output
   *     MAIN_SW         - pin11 RA2 ext_INT P.U. Fall edge
@@ -20,6 +20,10 @@
   * 
   * 
   * 2024.01.22
+  * 
+  * 2024.02.04  ver.1.00    とりあえず動作オッケー
+  * 
+  * 
   * 
   */
  
@@ -66,8 +70,11 @@ int main(void){
     INTERRUPT_PeripheralInterruptEnable(); 
 
     // Disable the Peripheral Interrupts 
-    //INTERRUPT_PeripheralInterruptDisable(); 
-
+    //INTERRUPT_PeripheralInterruptDisable();
+    
+    VREGCONbits.VREGPM = 1; //1:Low power sleep..wakeup slower.
+    WDTCONbits.SWDTEN = 1;  //Watch Dog Timer:ON
+    
     __delay_ms(500);
     
     printf("\n\n");
@@ -102,13 +109,14 @@ int main(void){
     }
     */
     
-    VREGCONbits.VREGPM = 1; //1:Low power sleep..wakeup slower.
-    WDTCONbits.SWDTEN = 1;  //Watch Dog Timer:ON
-    
     while(1){
         if (boost5VoltFlag == 1){
-            printf("boost 5V on \n");
-            awake();
+            __delay_ms(5);
+            if (BOOST_5V_IN_PORT == 1){
+                printf("boost 5V on \n");
+            
+                //awake();////////////////////////////////
+            }
         }
         
         if (BOOST_5V_IN_PORT == 0){
@@ -117,7 +125,7 @@ int main(void){
             //---------------- S L E E P ------------------------------------
             
             
-            resetRestart();
+            resetRestart(); //???????
             //awake();//???????????????????????
         }
         
