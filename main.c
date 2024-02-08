@@ -7,7 +7,7 @@
   * 
   *     EUSART          - pin3  TX  debugger serial
   * 
-  *     BOOST_5V_IN     - pin5  RC5 Input IRQ.rise edge  P.D.100k
+  *     IP5306_IRQ      - pin5  RC5 Input IRQ.rise edge  P.D.100k
   *     CHARGE_LED_RED  - pin6  RC4 Output
   *     BOOST5V_SW      - pin7  RC3 Output
   *     MAIN_SW         - pin11 RA2 ext_INT P.U. Fall edge
@@ -22,6 +22,7 @@
   * 2024.01.22
   * 
   * 2024.02.04  ver.1.00    とりあえず動作オッケー
+  * 2024.02.08  ver.1.01    7秒長押しでリセット動作
   * 
   * 
   * 
@@ -35,15 +36,15 @@
 */
 
 bool mainSwFlag = 0;        //メインスイッチ割込
-bool boost5VoltFlag = 0;    //Boost 5V output signal
+bool boostIRQflag = 0;      //Boost 5V output status
 
 void mainSwOn_callback(void){
     mainSwFlag = 1;
 }
 
-void boost5Vin_callback(void){
+void iP5306_irq_callback(void){
     //ブースト5V出力信号
-    boost5VoltFlag = 1;
+    boostIRQflag = 1;
 }
 
 int main(void){
@@ -52,7 +53,7 @@ int main(void){
     SYSTEM_Initialize();
 
     INT_SetInterruptHandler(mainSwOn_callback);
-    BOOST_5V_IN_SetInterruptHandler(boost5Vin_callback);
+    IP5306_IRQ_SetInterruptHandler(iP5306_irq_callback);
 
     BOOST5V_SW_SetHigh();   //5V OUTPUT LoadSwitchオン
 
@@ -84,75 +85,55 @@ int main(void){
     printf("******************\n");
     printf("\n");
 
-    ip5306_Init();
-    /*
-    cnt = 5;
-    while (ip5306_Init()){
-        __delay_ms(1000);
-        cnt--;
-        if (cnt <= 0){
-            printf("I2C Error!\n");
-            BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchオフ
-            CHARGE_LED_RED_SetHigh();   //赤LED点灯 -> エラー
-            sleepStat = POWERSAVING_DEEPSLEEP;
-            WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
-            printf("---DEEP SLEEP-----\n");
-            __delay_ms(500);
-            SLEEP();                    //スリープ
+    //IP5306_ON_SetLow();    //iP5306をPICから強制的にオンする
+    //__delay_ms(80);
+    //IP5306_ON_SetHigh();    //iP5306をPICから強制的にオンする
+
     
-            ///////////////////////// DEEP SLEEP //////////////////////////////////////////////////
-    
-            NOP();
-            NOP();
-            resetRestart();
-        }
+    if(ip5306_Init()){
+        printf("I2C Error!\n");
+        BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchオフ
+        CHARGE_LED_RED_SetHigh();   //赤LED点灯 -> エラー
+        sleepStat = POWERSAVING_DEEPSLEEP;
+        WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
+        printf("---DEEP SLEEP-----\n");
+        __delay_ms(500);
+        SLEEP();                    //スリープ
+
+        ///////////////////////// DEEP SLEEP //////////////////////////////////////////////////
+
+        NOP();
+        NOP();
+        resetRestart(); 
     }
-    */
     
+    // main loop ------------------------
     while(1){
-        if (boost5VoltFlag == 1){
+        if (boostIRQflag == 1){
             __delay_ms(5);
-            if (BOOST_5V_IN_PORT == 1){
+            if (IP5306_IRQ_PORT == 1){
                 printf("boost 5V on \n");
-            
-                //awake();////////////////////////////////
+                awake();
             }
         }
         
-        if (BOOST_5V_IN_PORT == 0){
-            printf("BOOST 5V off \n");
-            deepSleep();
-            //---------------- S L E E P ------------------------------------
+        if (IP5306_IRQ_PORT == 0){
+            printf("IRQ Low...");
+            if(ip5306_Init()){
+                //error = ip5306がOFF
+                printf("BOOST OFF confirm\n");
+                deepSleep();
+                //---------------- S L E E P ------------------------------------
             
-            
-            resetRestart(); //???????
-            //awake();//???????????????????????
+                awake();
+            }else{
+                //OK = ip5306はオンしていてI2Cの設定ができた
+                printf("iP5306 I2C Ok\n");
+            }
         }
         
         ip5306_ReadStatus();
 
-        /*
-        cnt = 5;
-        while (ip5306_ReadStatus()){
-            __delay_ms(1000);
-            cnt--;
-            if (cnt <= 0){
-                printf("I2C Error!\n");
-                CHARGE_LED_RED_SetHigh();   //赤LED点灯 -> エラー
-                sleepStat = POWERSAVING_DEEPSLEEP;
-                WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
-                printf("---DEEP SLEEP-----\n");
-                __delay_ms(500);
-                SLEEP();                    //スリープ
-
-                ///////////////////////// DEEP SLEEP //////////////////////////////////////////////////
-
-                NOP();
-                NOP();
-                resetRestart();
-            }
-        }
-        */
         
         //printf("interval sleep in \n\n");
         SLEEP();
@@ -181,7 +162,7 @@ void awake(void){
     BOOST5V_SW_SetHigh();   //5V OUTPUT LoadSwitchオン
     ip5306_Init();
     WDTCONbits.SWDTEN = 1;
-    boost5VoltFlag = 0;
+    boostIRQflag = 0;
 }
 
 
@@ -191,8 +172,8 @@ void intervalSleep(void){
     sleepStat = POWERSAVING_SLEEP;
     BOOST5V_SW_SetLow();                //5V OUTPUT LoadSwitchオフ
     WDTCONbits.SWDTEN = 1;
-    printf("\nboost SW off\n");  //充電完了待ち状態へ節電
-    if (BOOST_5V_IN_PORT == 1){
+    printf("\n5V loadSW off\n");  //充電完了待ち状態へ節電
+    if (IP5306_IRQ_PORT == 1){
         //boost5V出力中 = USB 5V IN 充電中　
         printf("wait to FullCharge \n");
     }

@@ -87,25 +87,6 @@
 #define IO_RA4_SetOpenDrain()       do { ODCONAbits.ODCA4 = 1; } while(0)
 #define IO_RA4_SetAnalogMode()      do { ANSELAbits.ANSA4 = 1; } while(0)
 #define IO_RA4_SetDigitalMode()     do { ANSELAbits.ANSA4 = 0; } while(0)
-// get/set IO_RA5 aliases
-#define IO_RA5_TRIS                 TRISAbits.TRISA5
-#define IO_RA5_LAT                  LATAbits.LATA5
-#define IO_RA5_PORT                 PORTAbits.RA5
-#define IO_RA5_WPU                  WPUAbits.WPUA5
-#define IO_RA5_OD                   ODCONAbits.ODCA5
-#define IO_RA5_ANS                  ANSELAbits.ANSA5
-#define IO_RA5_SetHigh()            do { LATAbits.LATA5 = 1; } while(0)
-#define IO_RA5_SetLow()             do { LATAbits.LATA5 = 0; } while(0)
-#define IO_RA5_Toggle()             do { LATAbits.LATA5 = ~LATAbits.LATA5; } while(0)
-#define IO_RA5_GetValue()           PORTAbits.RA5
-#define IO_RA5_SetDigitalInput()    do { TRISAbits.TRISA5 = 1; } while(0)
-#define IO_RA5_SetDigitalOutput()   do { TRISAbits.TRISA5 = 0; } while(0)
-#define IO_RA5_SetPullup()          do { WPUAbits.WPUA5 = 1; } while(0)
-#define IO_RA5_ResetPullup()        do { WPUAbits.WPUA5 = 0; } while(0)
-#define IO_RA5_SetPushPull()        do { ODCONAbits.ODCA5 = 0; } while(0)
-#define IO_RA5_SetOpenDrain()       do { ODCONAbits.ODCA5 = 1; } while(0)
-#define IO_RA5_SetAnalogMode()      do { ANSELAbits.ANSA5 = 1; } while(0)
-#define IO_RA5_SetDigitalMode()     do { ANSELAbits.ANSA5 = 0; } while(0)
 // get/set IO_RC0 aliases
 #define IO_RC0_TRIS                 TRISCbits.TRISC0
 #define IO_RC0_LAT                  LATCbits.LATC0
@@ -144,25 +125,6 @@
 #define IO_RC1_SetOpenDrain()       do { ODCONCbits.ODCC1 = 1; } while(0)
 #define IO_RC1_SetAnalogMode()      do { ANSELCbits.ANSC1 = 1; } while(0)
 #define IO_RC1_SetDigitalMode()     do { ANSELCbits.ANSC1 = 0; } while(0)
-// get/set IO_RC2 aliases
-#define IO_RC2_TRIS                 TRISCbits.TRISC2
-#define IO_RC2_LAT                  LATCbits.LATC2
-#define IO_RC2_PORT                 PORTCbits.RC2
-#define IO_RC2_WPU                  WPUCbits.WPUC2
-#define IO_RC2_OD                   ODCONCbits.ODCC2
-#define IO_RC2_ANS                  ANSELCbits.ANSC2
-#define IO_RC2_SetHigh()            do { LATCbits.LATC2 = 1; } while(0)
-#define IO_RC2_SetLow()             do { LATCbits.LATC2 = 0; } while(0)
-#define IO_RC2_Toggle()             do { LATCbits.LATC2 = ~LATCbits.LATC2; } while(0)
-#define IO_RC2_GetValue()           PORTCbits.RC2
-#define IO_RC2_SetDigitalInput()    do { TRISCbits.TRISC2 = 1; } while(0)
-#define IO_RC2_SetDigitalOutput()   do { TRISCbits.TRISC2 = 0; } while(0)
-#define IO_RC2_SetPullup()          do { WPUCbits.WPUC2 = 1; } while(0)
-#define IO_RC2_ResetPullup()        do { WPUCbits.WPUC2 = 0; } while(0)
-#define IO_RC2_SetPushPull()        do { ODCONCbits.ODCC2 = 0; } while(0)
-#define IO_RC2_SetOpenDrain()       do { ODCONCbits.ODCC2 = 1; } while(0)
-#define IO_RC2_SetAnalogMode()      do { ANSELCbits.ANSC2 = 1; } while(0)
-#define IO_RC2_SetDigitalMode()     do { ANSELCbits.ANSC2 = 0; } while(0)
 // get/set IO_RC3 aliases
 #define BOOST5V_SW_TRIS                 TRISCbits.TRISC3
 #define BOOST5V_SW_LAT                  LATCbits.LATC3
@@ -202,25 +164,25 @@
 #define CHARGE_LED_RED_SetAnalogMode()      do { ANSELCbits.ANSC4 = 1; } while(0)
 #define CHARGE_LED_RED_SetDigitalMode()     do { ANSELCbits.ANSC4 = 0; } while(0)
 // get/set IO_RC5 aliases
-#define BOOST_5V_IN_TRIS                 TRISCbits.TRISC5
-#define BOOST_5V_IN_LAT                  LATCbits.LATC5
-#define BOOST_5V_IN_PORT                 PORTCbits.RC5
-#define BOOST_5V_IN_WPU                  WPUCbits.WPUC5
-#define BOOST_5V_IN_OD                   ODCONCbits.ODCC5
-#define BOOST_5V_IN_ANS                  ANSELCbits.ANSC5
-#define BOOST_5V_IN_SetHigh()            do { LATCbits.LATC5 = 1; } while(0)
-#define BOOST_5V_IN_SetLow()             do { LATCbits.LATC5 = 0; } while(0)
-#define BOOST_5V_IN_Toggle()             do { LATCbits.LATC5 = ~LATCbits.LATC5; } while(0)
-#define BOOST_5V_IN_GetValue()           PORTCbits.RC5
-#define BOOST_5V_IN_SetDigitalInput()    do { TRISCbits.TRISC5 = 1; } while(0)
-#define BOOST_5V_IN_SetDigitalOutput()   do { TRISCbits.TRISC5 = 0; } while(0)
-#define BOOST_5V_IN_SetPullup()          do { WPUCbits.WPUC5 = 1; } while(0)
-#define BOOST_5V_IN_ResetPullup()        do { WPUCbits.WPUC5 = 0; } while(0)
-#define BOOST_5V_IN_SetPushPull()        do { ODCONCbits.ODCC5 = 0; } while(0)
-#define BOOST_5V_IN_SetOpenDrain()       do { ODCONCbits.ODCC5 = 1; } while(0)
-#define BOOST_5V_IN_SetAnalogMode()      do { ANSELCbits.ANSC5 = 1; } while(0)
-#define BOOST_5V_IN_SetDigitalMode()     do { ANSELCbits.ANSC5 = 0; } while(0)
-#define RC5_SetInterruptHandler  BOOST_5V_IN_SetInterruptHandler
+#define IP5306_IRQ_TRIS                 TRISCbits.TRISC5
+#define IP5306_IRQ_LAT                  LATCbits.LATC5
+#define IP5306_IRQ_PORT                 PORTCbits.RC5
+#define IP5306_IRQ_WPU                  WPUCbits.WPUC5
+#define IP5306_IRQ_OD                   ODCONCbits.ODCC5
+#define IP5306_IRQ_ANS                  ANSELCbits.ANSC5
+#define IP5306_IRQ_SetHigh()            do { LATCbits.LATC5 = 1; } while(0)
+#define IP5306_IRQ_SetLow()             do { LATCbits.LATC5 = 0; } while(0)
+#define IP5306_IRQ_Toggle()             do { LATCbits.LATC5 = ~LATCbits.LATC5; } while(0)
+#define IP5306_IRQ_GetValue()           PORTCbits.RC5
+#define IP5306_IRQ_SetDigitalInput()    do { TRISCbits.TRISC5 = 1; } while(0)
+#define IP5306_IRQ_SetDigitalOutput()   do { TRISCbits.TRISC5 = 0; } while(0)
+#define IP5306_IRQ_SetPullup()          do { WPUCbits.WPUC5 = 1; } while(0)
+#define IP5306_IRQ_ResetPullup()        do { WPUCbits.WPUC5 = 0; } while(0)
+#define IP5306_IRQ_SetPushPull()        do { ODCONCbits.ODCC5 = 0; } while(0)
+#define IP5306_IRQ_SetOpenDrain()       do { ODCONCbits.ODCC5 = 1; } while(0)
+#define IP5306_IRQ_SetAnalogMode()      do { ANSELCbits.ANSC5 = 1; } while(0)
+#define IP5306_IRQ_SetDigitalMode()     do { ANSELCbits.ANSC5 = 0; } while(0)
+#define RC5_SetInterruptHandler  IP5306_IRQ_SetInterruptHandler
 /**
  * @ingroup  pinsdriver
  * @brief GPIO and peripheral I/O initialization
@@ -239,43 +201,43 @@ void PIN_MANAGER_IOC(void);
 
 /**
  * @ingroup  pinsdriver
- * @brief Interrupt on Change Handler for the BOOST_5V_IN pin functionality
+ * @brief Interrupt on Change Handler for the IP5306_IRQ pin functionality
  * @param none
  * @return none
  */
-void BOOST_5V_IN_ISR(void);
+void IP5306_IRQ_ISR(void);
 
 /**
  * @ingroup  pinsdriver
- * @brief Interrupt Handler Setter for BOOST_5V_IN pin interrupt-on-change functionality.
- *        Allows selecting an interrupt handler for BOOST_5V_IN at application runtime.
+ * @brief Interrupt Handler Setter for IP5306_IRQ pin interrupt-on-change functionality.
+ *        Allows selecting an interrupt handler for IP5306_IRQ at application runtime.
  * @pre Pins intializer called
  * @param InterruptHandler function pointer.
  * @return none
  */
-void BOOST_5V_IN_SetInterruptHandler(void (* InterruptHandler)(void));
+void IP5306_IRQ_SetInterruptHandler(void (* InterruptHandler)(void));
 
 /**
  * @ingroup  pinsdriver
- * @brief Dynamic Interrupt Handler for BOOST_5V_IN pin.
- *        This is a dynamic interrupt handler to be used together with the BOOST_5V_IN_SetInterruptHandler() method.
- *        This handler is called every time the BOOST_5V_IN ISR is executed and allows any function to be registered at runtime.
+ * @brief Dynamic Interrupt Handler for IP5306_IRQ pin.
+ *        This is a dynamic interrupt handler to be used together with the IP5306_IRQ_SetInterruptHandler() method.
+ *        This handler is called every time the IP5306_IRQ ISR is executed and allows any function to be registered at runtime.
  * @pre Pins intializer called
  * @param none
  * @return none
  */
-extern void (*BOOST_5V_IN_InterruptHandler)(void);
+extern void (*IP5306_IRQ_InterruptHandler)(void);
 
 /**
  * @ingroup  pinsdriver
- * @brief Default Interrupt Handler for BOOST_5V_IN pin. 
- *        This is a predefined interrupt handler to be used together with the BOOST_5V_IN_SetInterruptHandler() method.
- *        This handler is called every time the BOOST_5V_IN ISR is executed. 
+ * @brief Default Interrupt Handler for IP5306_IRQ pin. 
+ *        This is a predefined interrupt handler to be used together with the IP5306_IRQ_SetInterruptHandler() method.
+ *        This handler is called every time the IP5306_IRQ ISR is executed. 
  * @pre Pins intializer called
  * @param none
  * @return none
  */
-void BOOST_5V_IN_DefaultInterruptHandler(void);
+void IP5306_IRQ_DefaultInterruptHandler(void);
 
 
 #endif // PINS_H

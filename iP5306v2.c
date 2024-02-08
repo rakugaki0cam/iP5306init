@@ -91,6 +91,11 @@ bool ip5306_Init(void){
         printf("I2C write read error!\n");
     }
     
+    if ((rxData[0] | rxData[1] | rxData[2]) == 0){
+        printf("I2C read error!\n");
+        return ERROR;
+    }
+    
 #ifdef DEBUG5306
     printf("\n(I2C 0x%02X reg 0x%02X\n", IP5306_SLAVE_ID, REG_SYS_CTL0);
     printf("read  %02X %02X %02X) \n", rxData[0], rxData[1], rxData[2]);
@@ -139,7 +144,7 @@ bool ip5306_ReadStatus(void){
     uint8_t batPercent = 100;   //%
     static bool    usbinFlag = 0;
 
-    if (BOOST_5V_IN_PORT == 0){
+    if (IP5306_IRQ_PORT == 0){
        //iP5306 ONの確認
        printf("BOOST 5V off \n");
        CHARGE_LED_RED_SetHigh();   //赤LED点灯 -> エラー
@@ -281,8 +286,11 @@ void mainSwPush(void){
                 __delay_ms(50);
                 printf(".");
                 sleep_sw_timer++;
+                if (sleep_sw_timer > 140){  //7秒
+                    resetRestart();         //リセット再起動
+                }
                 if (sleep_sw_timer > 60){   //3秒
-                    intervalSleep();             //インターバルスリープ
+                    intervalSleep();        //インターバルスリープ
                     break;
                 }
             }
