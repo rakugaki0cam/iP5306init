@@ -20,6 +20,8 @@
 
 
 
+//main switch
+void    mainSwPush(void);
 //
 void    awake(void);
 void    intervalSleep(void);

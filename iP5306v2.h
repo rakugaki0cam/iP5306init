@@ -13,6 +13,9 @@
 
 
 //Global
+
+
+
 typedef enum
 {
     POWERSAVING_NORMAL = 0,
@@ -28,8 +31,7 @@ extern power_saving_mask_t sleepStat;
 bool    ip5306_Init(void);
 bool    ip5306_ReadStatus(void);
 
-//main switch
-void    mainSwPush(void);
+
 
 
 

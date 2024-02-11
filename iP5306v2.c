@@ -40,11 +40,10 @@
 #define REG_READ4           0x78
 
 
-//メインスイッチ押し状態
-#define     MAIN_SW_PUSH    !MAIN_SW_PORT
 
 #define     ERROR   1
 #define     OK      0
+
 
 //Global
 power_saving_mask_t sleepStat = POWERSAVING_NORMAL;
@@ -239,7 +238,7 @@ bool ip5306_ReadStatus(void){
             __delay_ms(1);
 #endif
             CHARGE_LED_RED_SetLow();
-            if (sleepStat == POWERSAVING_SLEEP){
+            if (POWERSAVING_SLEEP == sleepStat){
                 deepSleep();
                 
                 //------------- DEEP SLEEP -------------------------------------
@@ -268,39 +267,4 @@ bool ip5306_ReadStatus(void){
 
 
 
-//***** main switch ************************************************************
-
-void mainSwPush(void){
-    //メインスイッチが押された時
-    uint8_t sleep_sw_timer = 0;
-
-    __delay_ms(50);      //チャタリング対策
-    if(MAIN_SW_PUSH){
-        printf("mainSW ON\n");
-        if (POWERSAVING_NORMAL == sleepStat){
-            //スリープ中でない時は長押し判定
-            //充電中の長押しでみせかけのスリープ状態にする
-            sleep_sw_timer = 0;
-            while(MAIN_SW_PUSH){
-                //長押し中
-                __delay_ms(50);
-                printf(".");
-                sleep_sw_timer++;
-                if (sleep_sw_timer > 140){  //7秒
-                    resetRestart();         //リセット再起動
-                }
-                if (sleep_sw_timer > 60){   //3秒
-                    intervalSleep();        //インターバルスリープ
-                    break;
-                }
-            }
-            printf("\n");
-            __delay_ms(100);   
-            
-        }else{
-            //スリープ、ディープスリープ中なら
-            awake();
-        }
-    }
-}
 
