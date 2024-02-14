@@ -23,13 +23,16 @@
   * 
   * 2024.02.04  ver.1.00    とりあえず動作オッケー
   * 2024.02.08  ver.1.01    7秒長押しでリセット動作
-  * 
+  * 2024.02.14  ver.1.02    git混乱からの復元ポイントとして作成
   * 
   * 
   */
  
 #include "header.h"
 
+
+//メインスイッチ押し状態
+#define     MAIN_SW_PUSH    !MAIN_SW_PORT
 
 /*
     Main application
@@ -90,26 +93,15 @@ int main(void){
     //IP5306_ON_SetHigh();    //iP5306をPICから強制的にオンする
 
     
-    if(ip5306_Init()){
-        printf("I2C Error!\n");
-        BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchオフ
-        CHARGE_LED_RED_SetHigh();   //赤LED点灯 -> エラー
-        sleepStat = POWERSAVING_DEEPSLEEP;
-        WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
-        printf("---DEEP SLEEP-----\n");
-        __delay_ms(500);
-        SLEEP();                    //スリープ
-
-        ///////////////////////// DEEP SLEEP //////////////////////////////////////////////////
-
-        NOP();
-        NOP();
-        resetRestart(); 
-    }
+    while(MAIN_SW_PUSH);
+    
+    ip5306_Init();
+    
     
     // main loop ------------------------
     while(1){
         if (boostIRQflag == 1){
+            //rise edge
             __delay_ms(5);
             if (IP5306_IRQ_PORT == 1){
                 printf("boost 5V on \n");
@@ -125,7 +117,7 @@ int main(void){
                 deepSleep();
                 //---------------- S L E E P ------------------------------------
             
-                awake();
+                //awake();
             }else{
                 //OK = ip5306はオンしていてI2Cの設定ができた
                 printf("iP5306 I2C Ok\n");
@@ -150,8 +142,66 @@ int main(void){
             mainSwFlag = 0;
         }
         
+        CLRWDT();                   //ウォッチドックタイマ　クリア 
+
     }    
 }
+
+
+
+//***** main switch ************************************************************
+
+void mainSwPush(void){
+    //メインスイッチが押された時
+    uint8_t sleep_sw_timer = 0;
+
+    __delay_ms(50);      //チャタリング対策
+    if(MAIN_SW_PUSH){
+        printf("mainSW ON\n");
+        //if (POWERSAVING_NORMAL == sleepStat){
+            //スリープ中でない時は長押し判定
+            //充電中の長押しでみせかけのスリープ状態にする
+            sleep_sw_timer = 0;
+            while(MAIN_SW_PUSH){
+                //長押し中
+                __delay_ms(50);
+                CLRWDT();                   //ウォッチドックタイマ　クリア 
+                printf(".");
+                sleep_sw_timer++;
+                
+                if (IP5306_IRQ_PORT == 0){
+                    //USBアウトの時、長押しでターゲットをオフした時
+                    while(MAIN_SW_PUSH){
+                        //ボタンを離すまで待つ
+                        CLRWDT();
+                    }
+                    __delay_ms(50);
+                    deepSleep();
+                    //--------------sleep-------
+                    resetRestart();         //リセット再起動
+
+                }
+                if (sleep_sw_timer > 60){       //3秒
+                    sleepStat = POWERSAVING_SLEEP;
+                    intervalSleep();        //インターバルスリープ
+                    return;
+                }
+            }
+            
+            if (POWERSAVING_SLEEP == sleepStat){
+                //USBiイン=充電中の時はターゲットをオンする
+                awake();
+            }
+            
+            
+            
+        //}else{
+        //    //スリープ、ディープスリープ中なら
+        //    awake();
+        //}
+    }
+}
+
 
 
 //--- WAKE -----
