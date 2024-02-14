@@ -28,6 +28,7 @@
   * 2024.02.14  ver.1.02b   shiftJIS -> UTF-8
   * 2024.02.14  ver.1.10    メインスイッチとiP5306のスイッチを分離
   *                         5306SWcontrol ブランチにてコーディング
+  * 2024.02.14  ver.1.11    I2C通信不良の時iP5306のSWを一旦オフしてリセットしてみる。
   * 
   * 
   */
@@ -154,7 +155,7 @@ int main(void){
                 //error = ip5306がOFF
                 printf("BOOST OFF confirm\n");
                 deepSleep();
-                //---------------- S L E E P ------------------------------------
+                //----- D E E P   S L E E P ------------------------------------
             
             }else{
                 //OK = ip5306はオンしていてI2Cの設定ができた
@@ -167,7 +168,7 @@ int main(void){
         
         //printf("interval sleep in \n\n");
         SLEEP();
-        //---------- SLEEP ---------------
+        //----- INTERVAL SLEEP ---------------
         //wake　trigger ....WDT interval 4sec
         //                  INT mainSW push
         //                  IOC Boost5Vout signal
@@ -204,18 +205,23 @@ void mainSwPush(void){
             printf(".");
             sleep_sw_timer++;
 
-            if (IP5306_IRQ_PORT == 0){
-                //USBアウトの時、長押しでターゲットをオフした時
-                while(MAIN_SW_PUSH){
-                    //ボタンを離すまで待つ
+            //if (IP5306_IRQ_PORT == 0){
+            //    //USBアウトの時、長押しでターゲットをオフした時
+            //    BOOST5V_SW_SetLow();        //LCD消灯
+            //    while(MAIN_SW_PUSH){
+            //        //ボタンを離すまで待つ
                     CLRWDT();
-                }
-                __delay_ms(50);
-                deepSleep();
-                //--------- sleep -------
+            //    }
+            //    __delay_ms(50);
+            //    deepSleep();
+                //----- D E E P   S L E E P ------------------------------------
 
-            }
+            //}
+            
             if (sleep_sw_timer > 60){           //3秒
+                //USB-INの時 ---> 充電中なのでiP5306はオンのままインターバルスリープへ
+                //USB-OUTの時 --> スイッチオフ　全停止       
+                    //USB in-outの判定はI2CでOKなのか? 
                 sleepStat = POWERSAVING_SLEEP;
                 intervalSleep();                //インターバルスリープ
                 return;
@@ -267,10 +273,11 @@ void deepSleep(void){
     CHARGE_LED_RED_SetLow();
     WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
     __delay_ms(500);
-    SLEEP();                    //スリープ
+    SLEEP();
+    //----- D E E P   S L E E P ------------------------------------------------
     
-    ///////////////////////// DEEP SLEEP //////////////////////////////////////////////////
     
+    //----- A W A K E ----------------------------------------------------------
     NOP();
     NOP();
     resetRestart();
@@ -284,7 +291,7 @@ void resetRestart(void){
     printf("***** ReSTART! *****\n");
     __delay_ms(500);
     RESET();       //ソフトウエアリセット
-    
+    //----- R E S E T   R E S T A R T ------------------------------------------
 }
 
 
