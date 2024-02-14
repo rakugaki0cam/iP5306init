@@ -22,8 +22,8 @@
 void    mainSwOn_callback(void);
 void    iP5306_irq_callback(void);
 
-void    iP5306_ON(void);
-void    iP5306_OFF(void);
+void    ip5306_on(void);
+void    ip5306_off(void);
 
 //main switch
 void    mainSwPush(void);

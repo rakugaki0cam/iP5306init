@@ -7,11 +7,11 @@
   * 
   *     EUSART          - pin3  TX  debugger serial
   * 
-  *     IP5306_IRQ      - pin5  RC5 Input IRQ.rise edge  P.D.100k
-  *     CHARGE_LED_RED  - pin6  RC4 Output
-  *     BOOST5V_SW      - pin7  RC3 Output
-  *     IP5306_SW       - pin8  RC2 Output
-  *     MAIN_SW         - pin11 RA2 ext_INT P.U. Fall edge
+  *     IP5306_IRQ      - pin5  RC5 Input IRQ.rise edge  P.D.100k H:enable, L:disable
+  *     CHARGE_LED_RED  - pin6  RC4 Output - H:on, L:off
+  *     BOOST5V_SW      - pin7  RC3 Output - H:on, L:off
+  *     IP5306_SW       - pin8  RC2 Output - NPN Tr H:on, L:off
+  *     MAIN_SW         - pin11 RA2 ext_INT P.U. Fall edge H:off, L:on
   * 
   *     MSSP1 I2C       - pin9  SDA1
   *     MSSP1 I2C       - pin10 SCL1

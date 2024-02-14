@@ -50,7 +50,7 @@ power_saving_mask_t sleepStat = POWERSAVING_NORMAL;
 
 
 //***** iP5306 *****************************************************************
-bool ip5306_Init(void){
+bool ip5306_init(void){
     //I2C iP5306 init
 #define DEBUG5306
      
@@ -264,6 +264,11 @@ bool ip5306_ReadStatus(void){
 }
 
 
-
+void ip5306_reset(void){
+    //iP5306　I2C通信不良の時リセットする
+    ip5306_off();
+    __delay_ms(2);
+    ip5306_on();
+}
 
 

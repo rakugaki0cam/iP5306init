@@ -28,9 +28,10 @@ extern power_saving_mask_t sleepStat;
 
 
 //iP5306
-bool    ip5306_Init(void);
+bool    ip5306_init(void);
 bool    ip5306_ReadStatus(void);
 
+void    ip5306_reset(void);
 
 
 
