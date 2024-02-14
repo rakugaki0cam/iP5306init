@@ -88,16 +88,10 @@ int main(void){
     printf("       2024.02\n");
     printf("******************\n");
     printf("\n");
-
-    //IP5306_ON_SetLow();    //iP5306をPICから強制的にオンする
-    //__delay_ms(80);
-    //IP5306_ON_SetHigh();    //iP5306をPICから強制的にオンする
-
     
     while(MAIN_SW_PUSH);
     
     ip5306_Init();
-    
     
     // main loop ------------------------
     while(1){
@@ -159,47 +153,37 @@ void mainSwPush(void){
     __delay_ms(50);      //チャタリング対策
     if(MAIN_SW_PUSH){
         printf("mainSW ON\n");
-        //if (POWERSAVING_NORMAL == sleepStat){
-            //スリープ中でない時は長押し判定
-            //充電中の長押しでみせかけのスリープ状態にする
-            sleep_sw_timer = 0;
-            while(MAIN_SW_PUSH){
-                //長押し中
-                __delay_ms(50);
-                CLRWDT();                   //ウォッチドックタイマ　クリア 
-                printf(".");
-                sleep_sw_timer++;
-                
-                if (IP5306_IRQ_PORT == 0){
-                    //USBアウトの時、長押しでターゲットをオフした時
-                    while(MAIN_SW_PUSH){
-                        //ボタンを離すまで待つ
-                        CLRWDT();
-                    }
-                    __delay_ms(50);
-                    deepSleep();
-                    //--------------sleep-------
-                    resetRestart();         //リセット再起動
+        sleep_sw_timer = 0;
+        while(MAIN_SW_PUSH){
+            //長押し中
+            __delay_ms(50);
+            CLRWDT();                   //ウォッチドックタイマ　クリア 
+            printf(".");
+            sleep_sw_timer++;
 
+            if (IP5306_IRQ_PORT == 0){
+                //USBアウトの時、長押しでターゲットをオフした時
+                while(MAIN_SW_PUSH){
+                    //ボタンを離すまで待つ
+                    CLRWDT();
                 }
-                if (sleep_sw_timer > 60){       //3秒
-                    sleepStat = POWERSAVING_SLEEP;
-                    intervalSleep();        //インターバルスリープ
-                    return;
-                }
+                __delay_ms(50);
+                deepSleep();
+                //--------------sleep-------
+
             }
-            
-            if (POWERSAVING_SLEEP == sleepStat){
-                //USBiイン=充電中の時はターゲットをオンする
-                awake();
+            if (sleep_sw_timer > 60){       //3秒
+                sleepStat = POWERSAVING_SLEEP;
+                intervalSleep();        //インターバルスリープ
+                return;
             }
-            
-            
-            
-        //}else{
-        //    //スリープ、ディープスリープ中なら
-        //    awake();
-        //}
+        }
+
+        if (POWERSAVING_SLEEP == sleepStat){
+            //USBiイン=充電中の時はターゲットをオンする
+            awake();
+        }
+
     }
 }
 
@@ -246,6 +230,7 @@ void deepSleep(void){
     
     NOP();
     NOP();
+    resetRestart();
 }
 
 
