@@ -1,9 +1,9 @@
  /*
   * file:  main.c
   * 
-  * iP5306 ƒŠƒ`ƒEƒ€ƒoƒbƒeƒŠ[[“dƒ‚ƒWƒ…[ƒ‹Ý’è—pPIC
+  * iP5306 ãƒªãƒã‚¦ãƒ ãƒãƒƒãƒ†ãƒªãƒ¼å……é›»ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«è¨­å®šç”¨PIC
   *  PIC16F18326 14pin
-  *     Vdd = ƒoƒbƒeƒŠ[“dˆ³(–ñ3~4.2V)
+  *     Vdd = ãƒãƒƒãƒ†ãƒªãƒ¼é›»åœ§(ç´„3~4.2V)
   * 
   *     EUSART          - pin3  TX  debugger serial
   * 
@@ -15,15 +15,16 @@
   *     MSSP1 I2C       - pin9  SDA1
   *     MSSP1 I2C       - pin10 SCL1
   * 
-  *     pic‚ÍƒoƒbƒeƒŠ[‚É’¼Ú‚Â‚È‚®‚Ì‚Å“dŒ¹‚ÍØ‚ê‚È‚¢BƒXƒŠ[ƒv‚Å‘Î‰žBŽÀ‘ª15uA‚­‚ç‚¢B
+  *     picã¯ãƒãƒƒãƒ†ãƒªãƒ¼ã«ç›´æŽ¥ã¤ãªãã®ã§é›»æºã¯åˆ‡ã‚Œãªã„ã€‚ã‚¹ãƒªãƒ¼ãƒ—ã§å¯¾å¿œã€‚å®Ÿæ¸¬15uAãã‚‰ã„ã€‚
   * 
   * 
   * 
   * 2024.01.22
   * 
-  * 2024.02.04  ver.1.00    ‚Æ‚è‚ ‚¦‚¸“®ìƒIƒbƒP[
-  * 2024.02.08  ver.1.01    7•b’·‰Ÿ‚µ‚ÅƒŠƒZƒbƒg“®ì
-  * 2024.02.14  ver.1.02    git¬—‚©‚ç‚Ì•œŒ³ƒ|ƒCƒ“ƒg‚Æ‚µ‚Äì¬
+  * 2024.02.04  ver.1.00    ã¨ã‚Šã‚ãˆãšå‹•ä½œã‚ªãƒƒã‚±ãƒ¼
+  * 2024.02.08  ver.1.01    7ç§’é•·æŠ¼ã—ã§ãƒªã‚»ãƒƒãƒˆå‹•ä½œ
+  * 2024.02.14  ver.1.02    gitæ··ä¹±ã‹ã‚‰ã®å¾©å…ƒãƒã‚¤ãƒ³ãƒˆã¨ã—ã¦ä½œæˆ
+  * 2024.02.14  ver.1.02b   shiftJIS -> UTF-8
   * 
   * 
   */
@@ -31,14 +32,14 @@
 #include "header.h"
 
 
-//ƒƒCƒ“ƒXƒCƒbƒ`‰Ÿ‚µó‘Ô
+//ãƒ¡ã‚¤ãƒ³ã‚¹ã‚¤ãƒƒãƒæŠ¼ã—çŠ¶æ…‹
 #define     MAIN_SW_PUSH    !MAIN_SW_PORT
 
 /*
     Main application
 */
 
-bool mainSwFlag = 0;        //ƒƒCƒ“ƒXƒCƒbƒ`Š„ž
+bool mainSwFlag = 0;        //ãƒ¡ã‚¤ãƒ³ã‚¹ã‚¤ãƒƒãƒå‰²è¾¼
 bool boostIRQflag = 0;      //Boost 5V output status
 
 void mainSwOn_callback(void){
@@ -46,7 +47,7 @@ void mainSwOn_callback(void){
 }
 
 void iP5306_irq_callback(void){
-    //ƒu[ƒXƒg5Vo—ÍM†
+    //ãƒ–ãƒ¼ã‚¹ãƒˆ5Vå‡ºåŠ›ä¿¡å·
     boostIRQflag = 1;
 }
 
@@ -58,7 +59,7 @@ int main(void){
     INT_SetInterruptHandler(mainSwOn_callback);
     IP5306_IRQ_SetInterruptHandler(iP5306_irq_callback);
 
-    BOOST5V_SW_SetHigh();   //5V OUTPUT LoadSwitchƒIƒ“
+    BOOST5V_SW_SetHigh();   //5V OUTPUT LoadSwitchã‚ªãƒ³
 
     // If using interrupts in PIC18 High/Low Priority Mode you need to enable the Global High and Low Interrupts 
     // If using interrupts in PIC Mid-Range Compatibility Mode you need to enable the Global and Peripheral Interrupts 
@@ -88,9 +89,9 @@ int main(void){
     printf("******************\n");
     printf("\n");
 
-    //IP5306_ON_SetLow();    //iP5306‚ðPIC‚©‚ç‹­§“I‚ÉƒIƒ“‚·‚é
+    //IP5306_ON_SetLow();    //iP5306ã‚’PICã‹ã‚‰å¼·åˆ¶çš„ã«ã‚ªãƒ³ã™ã‚‹
     //__delay_ms(80);
-    //IP5306_ON_SetHigh();    //iP5306‚ðPIC‚©‚ç‹­§“I‚ÉƒIƒ“‚·‚é
+    //IP5306_ON_SetHigh();    //iP5306ã‚’PICã‹ã‚‰å¼·åˆ¶çš„ã«ã‚ªãƒ³ã™ã‚‹
 
     
     while(MAIN_SW_PUSH);
@@ -112,14 +113,14 @@ int main(void){
         if (IP5306_IRQ_PORT == 0){
             printf("IRQ Low...");
             if(ip5306_Init()){
-                //error = ip5306‚ªOFF
+                //error = ip5306ãŒOFF
                 printf("BOOST OFF confirm\n");
                 deepSleep();
                 //---------------- S L E E P ------------------------------------
             
                 //awake();
             }else{
-                //OK = ip5306‚ÍƒIƒ“‚µ‚Ä‚¢‚ÄI2C‚ÌÝ’è‚ª‚Å‚«‚½
+                //OK = ip5306ã¯ã‚ªãƒ³ã—ã¦ã„ã¦I2Cã®è¨­å®šãŒã§ããŸ
                 printf("iP5306 I2C Ok\n");
             }
         }
@@ -142,7 +143,7 @@ int main(void){
             mainSwFlag = 0;
         }
         
-        CLRWDT();                   //ƒEƒHƒbƒ`ƒhƒbƒNƒ^ƒCƒ}@ƒNƒŠƒA 
+        CLRWDT();                   //ã‚¦ã‚©ãƒƒãƒãƒ‰ãƒƒã‚¯ã‚¿ã‚¤ãƒžã€€ã‚¯ãƒªã‚¢ 
 
     }    
 }
@@ -152,51 +153,51 @@ int main(void){
 //***** main switch ************************************************************
 
 void mainSwPush(void){
-    //ƒƒCƒ“ƒXƒCƒbƒ`‚ª‰Ÿ‚³‚ê‚½Žž
+    //ãƒ¡ã‚¤ãƒ³ã‚¹ã‚¤ãƒƒãƒãŒæŠ¼ã•ã‚ŒãŸæ™‚
     uint8_t sleep_sw_timer = 0;
 
-    __delay_ms(50);      //ƒ`ƒƒƒ^ƒŠƒ“ƒO‘Îô
+    __delay_ms(50);      //ãƒãƒ£ã‚¿ãƒªãƒ³ã‚°å¯¾ç­–
     if(MAIN_SW_PUSH){
         printf("mainSW ON\n");
         //if (POWERSAVING_NORMAL == sleepStat){
-            //ƒXƒŠ[ƒv’†‚Å‚È‚¢Žž‚Í’·‰Ÿ‚µ”»’è
-            //[“d’†‚Ì’·‰Ÿ‚µ‚Å‚Ý‚¹‚©‚¯‚ÌƒXƒŠ[ƒvó‘Ô‚É‚·‚é
+            //ã‚¹ãƒªãƒ¼ãƒ—ä¸­ã§ãªã„æ™‚ã¯é•·æŠ¼ã—åˆ¤å®š
+            //å……é›»ä¸­ã®é•·æŠ¼ã—ã§ã¿ã›ã‹ã‘ã®ã‚¹ãƒªãƒ¼ãƒ—çŠ¶æ…‹ã«ã™ã‚‹
             sleep_sw_timer = 0;
             while(MAIN_SW_PUSH){
-                //’·‰Ÿ‚µ’†
+                //é•·æŠ¼ã—ä¸­
                 __delay_ms(50);
-                CLRWDT();                   //ƒEƒHƒbƒ`ƒhƒbƒNƒ^ƒCƒ}@ƒNƒŠƒA 
+                CLRWDT();                   //ã‚¦ã‚©ãƒƒãƒãƒ‰ãƒƒã‚¯ã‚¿ã‚¤ãƒžã€€ã‚¯ãƒªã‚¢ 
                 printf(".");
                 sleep_sw_timer++;
                 
                 if (IP5306_IRQ_PORT == 0){
-                    //USBƒAƒEƒg‚ÌŽžA’·‰Ÿ‚µ‚Åƒ^[ƒQƒbƒg‚ðƒIƒt‚µ‚½Žž
+                    //USBã‚¢ã‚¦ãƒˆã®æ™‚ã€é•·æŠ¼ã—ã§ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’ã‚ªãƒ•ã—ãŸæ™‚
                     while(MAIN_SW_PUSH){
-                        //ƒ{ƒ^ƒ“‚ð—£‚·‚Ü‚Å‘Ò‚Â
+                        //ãƒœã‚¿ãƒ³ã‚’é›¢ã™ã¾ã§å¾…ã¤
                         CLRWDT();
                     }
                     __delay_ms(50);
                     deepSleep();
                     //--------------sleep-------
-                    resetRestart();         //ƒŠƒZƒbƒgÄ‹N“®
+                    resetRestart();         //ãƒªã‚»ãƒƒãƒˆå†èµ·å‹•
 
                 }
-                if (sleep_sw_timer > 60){       //3•b
+                if (sleep_sw_timer > 60){       //3ç§’
                     sleepStat = POWERSAVING_SLEEP;
-                    intervalSleep();        //ƒCƒ“ƒ^[ƒoƒ‹ƒXƒŠ[ƒv
+                    intervalSleep();        //ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«ã‚¹ãƒªãƒ¼ãƒ—
                     return;
                 }
             }
             
             if (POWERSAVING_SLEEP == sleepStat){
-                //USBiƒCƒ“=[“d’†‚ÌŽž‚Íƒ^[ƒQƒbƒg‚ðƒIƒ“‚·‚é
+                //USBiã‚¤ãƒ³=å……é›»ä¸­ã®æ™‚ã¯ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’ã‚ªãƒ³ã™ã‚‹
                 awake();
             }
             
             
             
         //}else{
-        //    //ƒXƒŠ[ƒvAƒfƒB[ƒvƒXƒŠ[ƒv’†‚È‚ç
+        //    //ã‚¹ãƒªãƒ¼ãƒ—ã€ãƒ‡ã‚£ãƒ¼ãƒ—ã‚¹ãƒªãƒ¼ãƒ—ä¸­ãªã‚‰
         //    awake();
         //}
     }
@@ -209,7 +210,7 @@ void awake(void){
     printf("wake\n");
     sleepStat = POWERSAVING_NORMAL; 
     __delay_ms(1000);
-    BOOST5V_SW_SetHigh();   //5V OUTPUT LoadSwitchƒIƒ“
+    BOOST5V_SW_SetHigh();   //5V OUTPUT LoadSwitchã‚ªãƒ³
     ip5306_Init();
     WDTCONbits.SWDTEN = 1;
     boostIRQflag = 0;
@@ -218,13 +219,13 @@ void awake(void){
 
 //--- SLEEP -----
 void intervalSleep(void){
-    //PIC‚Í[“dƒXƒe[ƒ^ƒX‚Å[“dŠ®—¹‚ðƒ`ƒFƒbƒN‚·‚éB
+    //PICã¯å……é›»ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã§å……é›»å®Œäº†ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ã€‚
     sleepStat = POWERSAVING_SLEEP;
-    BOOST5V_SW_SetLow();                //5V OUTPUT LoadSwitchƒIƒt
+    BOOST5V_SW_SetLow();                //5V OUTPUT LoadSwitchã‚ªãƒ•
     WDTCONbits.SWDTEN = 1;
-    printf("\n5V loadSW off\n");  //[“dŠ®—¹‘Ò‚¿ó‘Ô‚Öß“d
+    printf("\n5V loadSW off\n");  //å……é›»å®Œäº†å¾…ã¡çŠ¶æ…‹ã¸ç¯€é›»
     if (IP5306_IRQ_PORT == 1){
-        //boost5Vo—Í’† = USB 5V IN [“d’†@
+        //boost5Vå‡ºåŠ›ä¸­ = USB 5V IN å……é›»ä¸­ã€€
         printf("wait to FullCharge \n");
     }
     printf("\n");
@@ -232,14 +233,14 @@ void intervalSleep(void){
 
     
 void deepSleep(void){
-    //[“dŠ®—¹Žž‚É‚ÍPIC‚ðŠ®‘SƒXƒŠ[ƒv‚É
+    //å……é›»å®Œäº†æ™‚ã«ã¯PICã‚’å®Œå…¨ã‚¹ãƒªãƒ¼ãƒ—ã«
     sleepStat = POWERSAVING_DEEPSLEEP;
     printf("---DEEP SLEEP-----\n");
-    BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchƒIƒt
+    BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchã‚ªãƒ•
     CHARGE_LED_RED_SetLow();
-    WDTCONbits.SWDTEN = 0;      //WDT‚Å‚ÌƒXƒŠ[ƒv‰ðœ‚È‚µ
+    WDTCONbits.SWDTEN = 0;      //WDTã§ã®ã‚¹ãƒªãƒ¼ãƒ—è§£é™¤ãªã—
     __delay_ms(500);
-    SLEEP();                    //ƒXƒŠ[ƒv
+    SLEEP();                    //ã‚¹ãƒªãƒ¼ãƒ—
     
     ///////////////////////// DEEP SLEEP //////////////////////////////////////////////////
     
@@ -254,7 +255,7 @@ void resetRestart(void){
     printf("\n");
     printf("***** ReSTART! *****\n");
     __delay_ms(500);
-    RESET();       //ƒ\ƒtƒgƒEƒGƒAƒŠƒZƒbƒg
+    RESET();       //ã‚½ãƒ•ãƒˆã‚¦ã‚¨ã‚¢ãƒªã‚»ãƒƒãƒˆ
     
 }
 

@@ -2,9 +2,9 @@
  * File:   iP5306v2.c
  * Comments: PIC16F18326
  * 
- * iP5306@ƒŠƒ`ƒEƒ€ƒCƒIƒ“ƒoƒbƒeƒŠ[“dA•ÛŒìA5Vƒu[ƒXƒgo—ÍAƒXƒCƒbƒ`@@I2C
+ * iP5306ã€€ãƒªãƒã‚¦ãƒ ã‚¤ã‚ªãƒ³ãƒãƒƒãƒ†ãƒªå……é›»ã€ä¿è­·ã€5Vãƒ–ãƒ¼ã‚¹ãƒˆå‡ºåŠ›ã€ã‚¹ã‚¤ãƒƒãƒã€€ã€€I2C
  * 
- * ƒƒCƒ“ƒXƒCƒbƒ`AƒXƒŠ[ƒv
+ * ãƒ¡ã‚¤ãƒ³ã‚¹ã‚¤ãƒƒãƒã€ã‚¹ãƒªãƒ¼ãƒ—
  * 
  * BatV - 3.3V convert  I2C
  * 
@@ -59,22 +59,22 @@ bool ip5306_Init(void){
     uint8_t waitCnt;
     
     //REG_SYS_CTL0                  //default 0x35 -> 0x31
-    uint8_t boost = 0b1;            //[bit5]ƒu[ƒXƒgo—Í     1:‚·‚é, 0:‚µ‚È‚¢ 
-    uint8_t charge = 0b1;           //[bit4][“d‹@”\        1:—LŒø, 0:–³Œø,
-    uint8_t autoOn = 0b0;           //[bit2]ƒI[ƒgƒIƒ“      1:‚·‚é, 0:‚µ‚È‚¢       ----*
-    uint8_t alwaysBoost = 0b0;      //[bit1]íƒu[ƒXƒg     0:‚µ‚È‚¢, 1:ƒIƒ“
-    uint8_t pushSwOff = 0b1;        //[bit0]ƒvƒbƒVƒ…SWƒIƒt   1:‰Â, 0:•s‰Â
+    uint8_t boost = 0b1;            //[bit5]ãƒ–ãƒ¼ã‚¹ãƒˆå‡ºåŠ›     1:ã™ã‚‹, 0:ã—ãªã„ 
+    uint8_t charge = 0b1;           //[bit4]å……é›»æ©Ÿèƒ½        1:æœ‰åŠ¹, 0:ç„¡åŠ¹,
+    uint8_t autoOn = 0b0;           //[bit2]ã‚ªãƒ¼ãƒˆã‚ªãƒ³      1:ã™ã‚‹, 0:ã—ãªã„       ----*
+    uint8_t alwaysBoost = 0b0;      //[bit1]å¸¸æ™‚ãƒ–ãƒ¼ã‚¹ãƒˆ     0:ã—ãªã„, 1:ã‚ªãƒ³
+    uint8_t pushSwOff = 0b1;        //[bit0]ãƒ—ãƒƒã‚·ãƒ¥SWã‚ªãƒ•   1:å¯, 0:ä¸å¯
     //REG_SYS_CTL1                  //default 0x1D -> 0xD9
-    uint8_t boostLongPush = 0b1;    //[bit7]ƒu[ƒXƒgƒIƒt     0:ƒ_ƒuƒ‹, 1:’·‰Ÿ‚µ     ----*
-    uint8_t leddoubleclick = 0b1;   //[bit6]LEDƒ‰ƒCƒg       0:’·‰Ÿ‚µ, 1:ƒ_ƒuƒ‹‰Ÿ‚µ ----* 
-    uint8_t shortPushOff = 0b0;     //[bit5]’Z‰Ÿ‚µƒIƒt       0:‚µ‚È‚¢, 1:‚·‚é
-    uint8_t usbCutBoost = 0b0;      //[bit2]USB”²ƒu[ƒXƒgo—Í 1:ƒIƒ“, 0:ƒIƒt@ (’.u’â‚µ‚Ä‚µ‚Ü‚¤)
-    uint8_t lowVoltage = 0b1;       //[bit0]3VˆÈ‰ºƒIƒt       1:‚·‚é@0:‚»‚Ì‚Ü‚Ü 
+    uint8_t boostLongPush = 0b1;    //[bit7]ãƒ–ãƒ¼ã‚¹ãƒˆã‚ªãƒ•     0:ãƒ€ãƒ–ãƒ«, 1:é•·æŠ¼ã—     ----*
+    uint8_t leddoubleclick = 0b1;   //[bit6]LEDãƒ©ã‚¤ãƒˆ       0:é•·æŠ¼ã—, 1:ãƒ€ãƒ–ãƒ«æŠ¼ã— ----* 
+    uint8_t shortPushOff = 0b0;     //[bit5]çŸ­æŠ¼ã—ã‚ªãƒ•       0:ã—ãªã„, 1:ã™ã‚‹
+    uint8_t usbCutBoost = 0b0;      //[bit2]USBæŠœæ™‚ãƒ–ãƒ¼ã‚¹ãƒˆå‡ºåŠ› 1:ã‚ªãƒ³, 0:ã‚ªãƒ•ã€€ (æ³¨.ç¬åœã—ã¦ã—ã¾ã†)
+    uint8_t lowVoltage = 0b1;       //[bit0]3Vä»¥ä¸‹ã‚ªãƒ•       1:ã™ã‚‹ã€€0:ãã®ã¾ã¾ 
     //REG_SYS_CTL2                  //default 0x64 -> 0x74
-    uint8_t longPushTime = 0b1;     //[bit4]’·‰Ÿ‚µŠÔ @@@@0:2sec, 1:3sec      ----*
-    uint8_t autoOffTime = 0b01;     //[bit3:2]ƒI[ƒgƒIƒtŠÔ  01:32sec, 00:8s, 10:16s, 11:64s
+    uint8_t longPushTime = 0b1;     //[bit4]é•·æŠ¼ã—æ™‚é–“ ã€€ã€€ã€€ã€€0:2sec, 1:3sec      ----*
+    uint8_t autoOffTime = 0b01;     //[bit3:2]ã‚ªãƒ¼ãƒˆã‚ªãƒ•æ™‚é–“  01:32sec, 00:8s, 10:16s, 11:64s
     
-    //ƒfƒtƒHƒ‹ƒg’l‚Ì“Ç‚İo‚µ
+    //ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã®èª­ã¿å‡ºã—
     printf("iP5306 init ...");
     txData[0] = REG_SYS_CTL0;
     if (!I2C1_Host.WriteRead(IP5306_SLAVE_ID, txData, 1, rxData, 3)){
@@ -85,7 +85,7 @@ bool ip5306_Init(void){
     while (I2C1_Host.IsBusy() && waitCnt){
         waitCnt--;              
     }
-    //printf("wait:%d \n", waitCnt);      //À‘ª’l98 ‚È‚Ì‚ÅÀÛ‚Í2‚µ‚©ƒJƒEƒ“ƒg‚³‚ê‚È‚¢ 
+    //printf("wait:%d \n", waitCnt);      //å®Ÿæ¸¬å€¤98 ãªã®ã§å®Ÿéš›ã¯2ã—ã‹ã‚«ã‚¦ãƒ³ãƒˆã•ã‚Œãªã„ 
     if (I2C1_Host.ErrorGet() != I2C_ERROR_NONE){
         printf("I2C write read error!\n");
     }
@@ -144,9 +144,9 @@ bool ip5306_ReadStatus(void){
     static bool    usbinFlag = 0;
 
     if (IP5306_IRQ_PORT == 0){
-       //iP5306 ON‚ÌŠm”F
+       //iP5306 ONã®ç¢ºèª
        printf("BOOST 5V off \n");
-       CHARGE_LED_RED_SetHigh();   //ÔLED“_“” -> ƒGƒ‰[
+       CHARGE_LED_RED_SetHigh();   //èµ¤LEDç‚¹ç¯ -> ã‚¨ãƒ©ãƒ¼
        return ERROR;
     }
     
@@ -230,9 +230,9 @@ bool ip5306_ReadStatus(void){
     }
 
     if (usbinFlag == 1){
-        //USBÚ‘±
+        //USBæ¥ç¶š
         if (chargeStatus & 0b00001000){
-            //[“dŠ®—¹ -> ƒfƒB[ƒvƒXƒŠ[ƒv
+            //å……é›»å®Œäº† -> ãƒ‡ã‚£ãƒ¼ãƒ—ã‚¹ãƒªãƒ¼ãƒ—
 #ifdef  DEBUG5306_2
             printf("FULL\n");
             __delay_ms(1);
@@ -247,7 +247,7 @@ bool ip5306_ReadStatus(void){
             }
             
         }else{
-            //[“d’†
+            //å……é›»ä¸­
 #ifdef  DEBUG5306_2
             printf("Charging\n");
             __delay_ms(1);
