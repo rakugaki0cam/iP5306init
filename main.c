@@ -58,7 +58,7 @@ void iP5306_irq_callback(void){
 }
 
 
-void iP5306_ON(void){
+void ip5306_on(void){
     //BOOST ON
     IP5306_SW_SetHigh();
     __delay_ms(10);         //5msec以上
@@ -66,7 +66,7 @@ void iP5306_ON(void){
 }
 
 
-void iP5306_OFF(void){
+void ip5306_off(void){
     //BOOST OFF(I2C mode)
     IP5306_SW_SetHigh();
     __delay_ms(3200);       //3sec以上
@@ -101,7 +101,7 @@ int main(void){
     IP5306_IRQ_SetInterruptHandler(iP5306_irq_callback);
     
     CHARGE_LED_RED_SetHigh();   //LED 赤オン
-    iP5306_ON();                //iP5306オン
+    ip5306_on();                //iP5306オン
     BOOST5V_SW_SetHigh();       //5V OUTPUT LoadSwitchオン
     
 
@@ -136,7 +136,18 @@ int main(void){
     CHARGE_LED_RED_SetLow();   //LED 赤オフ
     while(MAIN_SW_PUSH);
     
-    ip5306_Init();
+    if (ip5306_init()){
+        //I2C error
+        ip5306_reset();
+        __delay_ms(100);
+        if (ip5306_init()){
+            //I2C error 2回目
+            printf("BOOT ERROR!\n");
+            deepSleep();
+            //--- 起動不可 ------
+        }
+        
+    }
     
     // main loop ------------------------
     while(1){
@@ -151,7 +162,7 @@ int main(void){
         
         if (IP5306_IRQ_PORT == 0){
             printf("IRQ Low...");
-            if(ip5306_Init()){
+            if(ip5306_init()){
                 //error = ip5306がOFF
                 printf("BOOST OFF confirm\n");
                 deepSleep();
@@ -241,9 +252,9 @@ void awake(void){
     printf("wake\n");
     sleepStat = POWERSAVING_NORMAL; 
     __delay_ms(100);
-    iP5306_ON();
+    ip5306_on();
     BOOST5V_SW_SetHigh();           //5V OUTPUT LoadSwitchオン
-    ip5306_Init();
+    ip5306_init();
     WDTCONbits.SWDTEN = 1;
     boostIRQflag = 0;
 }
@@ -268,7 +279,7 @@ void deepSleep(void){
     //充電完了時にはPICを完全スリープに
     sleepStat = POWERSAVING_DEEPSLEEP;
     printf("---DEEP SLEEP-----\n");
-    iP5306_OFF();
+    ip5306_off();
     BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchオフ
     CHARGE_LED_RED_SetLow();
     WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
