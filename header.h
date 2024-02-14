@@ -19,6 +19,11 @@
 #include "iP5306v2.h"
 
 
+void    mainSwOn_callback(void);
+void    iP5306_irq_callback(void);
+
+void    iP5306_ON(void);
+void    iP5306_OFF(void);
 
 //main switch
 void    mainSwPush(void);

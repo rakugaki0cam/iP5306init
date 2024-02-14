@@ -243,7 +243,6 @@ bool ip5306_ReadStatus(void){
                 
                 //------------- DEEP SLEEP -------------------------------------
                 
-                //awake();
             }
             
         }else{

@@ -2,7 +2,7 @@
 
 manifest_file_version: 1.0.0
 project: ip5306init
-creation_date: 2024-02-08T22:12:45.198+09:00[Asia/Tokyo]
+creation_date: 2024-02-14T20:26:38.300+09:00[Asia/Tokyo]
 operating_system: Mac OS X
 mcc_mode: IDE
 mcc_mode_version: v6.20
@@ -12,7 +12,7 @@ mcc_version: 5.5.0
 mcc_core_version: 5.7.0
 content_manager_version: 5.0.0
 is_mcc_offline: false
-is_using_prerelease_versions: true
+is_using_prerelease_versions: false
 mcc_content_registries: https://registry.npmjs.org/
 device_library: {library_class: com.microchip.mcc.melody.Library, name: Melody, version: 2.6.4}
 packs: {name: PIC16F1xxxx_DFP, version: 1.24.387}

@@ -125,6 +125,25 @@
 #define IO_RC1_SetOpenDrain()       do { ODCONCbits.ODCC1 = 1; } while(0)
 #define IO_RC1_SetAnalogMode()      do { ANSELCbits.ANSC1 = 1; } while(0)
 #define IO_RC1_SetDigitalMode()     do { ANSELCbits.ANSC1 = 0; } while(0)
+// get/set IO_RC2 aliases
+#define IP5306_SW_TRIS                 TRISCbits.TRISC2
+#define IP5306_SW_LAT                  LATCbits.LATC2
+#define IP5306_SW_PORT                 PORTCbits.RC2
+#define IP5306_SW_WPU                  WPUCbits.WPUC2
+#define IP5306_SW_OD                   ODCONCbits.ODCC2
+#define IP5306_SW_ANS                  ANSELCbits.ANSC2
+#define IP5306_SW_SetHigh()            do { LATCbits.LATC2 = 1; } while(0)
+#define IP5306_SW_SetLow()             do { LATCbits.LATC2 = 0; } while(0)
+#define IP5306_SW_Toggle()             do { LATCbits.LATC2 = ~LATCbits.LATC2; } while(0)
+#define IP5306_SW_GetValue()           PORTCbits.RC2
+#define IP5306_SW_SetDigitalInput()    do { TRISCbits.TRISC2 = 1; } while(0)
+#define IP5306_SW_SetDigitalOutput()   do { TRISCbits.TRISC2 = 0; } while(0)
+#define IP5306_SW_SetPullup()          do { WPUCbits.WPUC2 = 1; } while(0)
+#define IP5306_SW_ResetPullup()        do { WPUCbits.WPUC2 = 0; } while(0)
+#define IP5306_SW_SetPushPull()        do { ODCONCbits.ODCC2 = 0; } while(0)
+#define IP5306_SW_SetOpenDrain()       do { ODCONCbits.ODCC2 = 1; } while(0)
+#define IP5306_SW_SetAnalogMode()      do { ANSELCbits.ANSC2 = 1; } while(0)
+#define IP5306_SW_SetDigitalMode()     do { ANSELCbits.ANSC2 = 0; } while(0)
 // get/set IO_RC3 aliases
 #define BOOST5V_SW_TRIS                 TRISCbits.TRISC3
 #define BOOST5V_SW_LAT                  LATCbits.LATC3

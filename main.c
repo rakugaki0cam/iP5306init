@@ -10,6 +10,7 @@
   *     IP5306_IRQ      - pin5  RC5 Input IRQ.rise edge  P.D.100k
   *     CHARGE_LED_RED  - pin6  RC4 Output
   *     BOOST5V_SW      - pin7  RC3 Output
+  *     IP5306_SW       - pin8  RC2 Output
   *     MAIN_SW         - pin11 RA2 ext_INT P.U. Fall edge
   * 
   *     MSSP1 I2C       - pin9  SDA1
@@ -25,6 +26,7 @@
   * 2024.02.08  ver.1.01    7秒長押しでリセット動作
   * 2024.02.14  ver.1.02    git混乱からの復元ポイントとして作成
   * 2024.02.14  ver.1.02b   shiftJIS -> UTF-8
+  * 2024.02.14  ver.1.10    メインスイッチとiP5306のスイッチを分離
   * 
   * 
   */
@@ -34,6 +36,7 @@
 
 //メインスイッチ押し状態
 #define     MAIN_SW_PUSH    !MAIN_SW_PORT
+
 
 /*
     Main application
@@ -46,10 +49,46 @@ void mainSwOn_callback(void){
     mainSwFlag = 1;
 }
 
+
 void iP5306_irq_callback(void){
     //ブースト5V出力信号
     boostIRQflag = 1;
 }
+
+
+void iP5306_ON(void){
+    //BOOST ON
+    IP5306_SW_SetHigh();
+    __delay_ms(10);         //5msec以上
+    IP5306_SW_SetLow();
+}
+
+
+void iP5306_OFF(void){
+    //BOOST OFF(I2C mode)
+    IP5306_SW_SetHigh();
+    __delay_ms(3200);       //3sec以上
+    IP5306_SW_SetLow();
+    
+    //check
+    __delay_ms(5);
+    if (IP5306_IRQ_PORT == 0){  //ここはダメかも?出力の5Vをチェックしないといけないかも
+        //off OK
+        return;
+    }
+    
+    //BOOST OFF(I2Cモードになっていない場合、バッテリ残量LEDモード=異常時)
+    IP5306_SW_SetHigh();
+    __delay_ms(10);
+    IP5306_SW_SetLow();
+    __delay_ms(200);
+    IP5306_SW_SetHigh();
+    __delay_ms(10);
+    IP5306_SW_SetLow();
+    //1sec以内にダブルクリック
+}
+
+
 
 int main(void){
     uint8_t cnt;
@@ -58,8 +97,11 @@ int main(void){
 
     INT_SetInterruptHandler(mainSwOn_callback);
     IP5306_IRQ_SetInterruptHandler(iP5306_irq_callback);
-
-    BOOST5V_SW_SetHigh();   //5V OUTPUT LoadSwitchオン
+    
+    CHARGE_LED_RED_SetHigh();   //LED 赤オン
+    iP5306_ON();                //iP5306オン
+    BOOST5V_SW_SetHigh();       //5V OUTPUT LoadSwitchオン
+    
 
     // If using interrupts in PIC18 High/Low Priority Mode you need to enable the Global High and Low Interrupts 
     // If using interrupts in PIC Mid-Range Compatibility Mode you need to enable the Global and Peripheral Interrupts 
@@ -89,6 +131,7 @@ int main(void){
     printf("******************\n");
     printf("\n");
     
+    CHARGE_LED_RED_SetLow();   //LED 赤オフ
     while(MAIN_SW_PUSH);
     
     ip5306_Init();
@@ -96,7 +139,7 @@ int main(void){
     // main loop ------------------------
     while(1){
         if (boostIRQflag == 1){
-            //rise edge
+            //rise edge interrupt
             __delay_ms(5);
             if (IP5306_IRQ_PORT == 1){
                 printf("boost 5V on \n");
@@ -112,7 +155,6 @@ int main(void){
                 deepSleep();
                 //---------------- S L E E P ------------------------------------
             
-                //awake();
             }else{
                 //OK = ip5306はオンしていてI2Cの設定ができた
                 printf("iP5306 I2C Ok\n");
@@ -125,9 +167,9 @@ int main(void){
         //printf("interval sleep in \n\n");
         SLEEP();
         //---------- SLEEP ---------------
-        //wake....  WDT interval 4sec
-        //          INT mainSW push
-        //          IOC Boost5Vout signal
+        //wake　trigger ....WDT interval 4sec
+        //                  INT mainSW push
+        //                  IOC Boost5Vout signal
         
         NOP();
         NOP();
@@ -169,32 +211,31 @@ void mainSwPush(void){
                 }
                 __delay_ms(50);
                 deepSleep();
-                //--------------sleep-------
+                //--------- sleep -------
 
             }
-            if (sleep_sw_timer > 60){       //3秒
+            if (sleep_sw_timer > 60){           //3秒
                 sleepStat = POWERSAVING_SLEEP;
-                intervalSleep();        //インターバルスリープ
+                intervalSleep();                //インターバルスリープ
                 return;
             }
         }
 
         if (POWERSAVING_SLEEP == sleepStat){
-            //USBiイン=充電中の時はターゲットをオンする
+            //USBイン = 充電中の時はターゲットをオンする
             awake();
         }
-
     }
 }
-
 
 
 //--- WAKE -----
 void awake(void){
     printf("wake\n");
     sleepStat = POWERSAVING_NORMAL; 
-    __delay_ms(1000);
-    BOOST5V_SW_SetHigh();   //5V OUTPUT LoadSwitchオン
+    __delay_ms(100);
+    iP5306_ON();
+    BOOST5V_SW_SetHigh();           //5V OUTPUT LoadSwitchオン
     ip5306_Init();
     WDTCONbits.SWDTEN = 1;
     boostIRQflag = 0;
@@ -205,9 +246,9 @@ void awake(void){
 void intervalSleep(void){
     //PICは充電ステータスで充電完了をチェックする。
     sleepStat = POWERSAVING_SLEEP;
-    BOOST5V_SW_SetLow();                //5V OUTPUT LoadSwitchオフ
+    BOOST5V_SW_SetLow();            //5V OUTPUT LoadSwitchオフ
     WDTCONbits.SWDTEN = 1;
-    printf("\n5V loadSW off\n");  //充電完了待ち状態へ節電
+    printf("\n5V loadSW off\n");    //充電完了待ち状態へ節電
     if (IP5306_IRQ_PORT == 1){
         //boost5V出力中 = USB 5V IN 充電中　
         printf("wait to FullCharge \n");
@@ -220,6 +261,7 @@ void deepSleep(void){
     //充電完了時にはPICを完全スリープに
     sleepStat = POWERSAVING_DEEPSLEEP;
     printf("---DEEP SLEEP-----\n");
+    iP5306_OFF();
     BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchオフ
     CHARGE_LED_RED_SetLow();
     WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
