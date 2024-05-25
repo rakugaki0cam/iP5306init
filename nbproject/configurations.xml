@@ -85,7 +85,7 @@
         <targetDevice>PIC16F18326</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>noID</platformTool>
+        <platformTool>pk4hybrid</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>2.46</languageToolchainVersion>
         <platform>4</platform>
@@ -321,7 +321,7 @@
                   value="toolpack.updateoptions.uselatestoolpack"/>
         <property key="toolpack.updateoptions.packversion"
                   value="Press to select which tool pack to use"/>
-        <property key="voltagevalue" value="4.10"/>
+        <property key="voltagevalue" value="5.0"/>
       </Tool>
       <XC8-CO>
         <property key="coverage-enable" value=""/>
@@ -411,7 +411,7 @@
                   value="toolpack.updateoptions.uselatestoolpack"/>
         <property key="toolpack.updateoptions.packversion"
                   value="Press to select which tool pack to use"/>
-        <property key="voltagevalue" value="4.10"/>
+        <property key="voltagevalue" value="5.0"/>
       </pk4hybrid>
     </conf>
   </confs>
