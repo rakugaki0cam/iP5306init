@@ -7,10 +7,10 @@
   * 
   *     EUSART          - pin3  TX  debugger serial
   * 
-  *     IP5306_IRQ      - pin5  RC5 Input IRQ.rise edge  P.D.100k H:enable, L:disable
+  *     //IP5306_IRQ      - pin5  RC5 Input IRQ.rise edge  P.D.100k H:enable, L:disable
   *     CHARGE_LED_RED  - pin6  RC4 Output - H:on, L:off
   *     BOOST5V_SW      - pin7  RC3 Output - H:on, L:off
-  *     IP5306_SW       - pin8  RC2 Output - NPN Tr H:on, L:off
+  *     //IP5306_SW       - pin8  RC2 Output - NPN Tr H:on, L:off
   *     MAIN_SW         - pin11 RA2 ext_INT P.U. Fall edge H:off, L:on
   * 
   *     MSSP1 I2C       - pin9  SDA1
@@ -47,51 +47,11 @@
 */
 
 bool mainSwFlag = 0;        //メインスイッチ割込
-bool boostIRQflag = 0;      //Boost 5V output status
+
 
 void mainSwOn_callback(void){
     mainSwFlag = 1;
 }
-
-
-void iP5306_irq_callback(void){
-    //ブースト5V出力信号
-    boostIRQflag = 1;
-}
-
-
-void ip5306_on(void){
-    //BOOST ON
-    IP5306_SW_SetHigh();
-    __delay_ms(40);         //30msec以上
-    IP5306_SW_SetLow();
-}
-
-
-void ip5306_off(void){
-    //BOOST OFF
-    IP5306_SW_SetHigh();
-    __delay_ms(3200);       //3sec以上
-    IP5306_SW_SetLow();
-    
-    //check
-    __delay_ms(5);
-    if (IP5306_IRQ_PORT == 0){  //ここはダメかも?出力の5Vをチェックしないといけないかも
-        //off OK
-        return;
-    }
-    
-    //BOOST OFF(I2Cモードになっていない場合、バッテリ残量LEDモード=異常時)
-    IP5306_SW_SetHigh();
-    __delay_ms(40);
-    IP5306_SW_SetLow();
-    __delay_ms(200);
-    IP5306_SW_SetHigh();
-    __delay_ms(40);
-    IP5306_SW_SetLow();
-    //1sec以内にダブルクリック
-}
-
 
 
 int main(void){
@@ -100,10 +60,8 @@ int main(void){
     SYSTEM_Initialize();
 
     INT_SetInterruptHandler(mainSwOn_callback);
-    IP5306_IRQ_SetInterruptHandler(iP5306_irq_callback);
     
     CHARGE_LED_RED_SetHigh();   //LED 赤オン
-    //ip5306_on();                //iP5306オン///////////////
     BOOST5V_SW_SetHigh();       //5V OUTPUT LoadSwitchオン
     
 
@@ -139,50 +97,13 @@ int main(void){
     while(MAIN_SW_PUSH);
     
     ip5306_init();
-/*
-    if (ip5306_init()){
-        //I2C error
-        ip5306_reset();
-        __delay_ms(100);
-        if (ip5306_init()){
-            //I2C error 2回目
-            printf("BOOT ERROR!\n");
-            deepSleep();
-            //--- 起動不可 ------
-        }
-        
-    }
-*/  
+
+    
     // main loop ------------------------
     while(1){
-/*
-        if (boostIRQflag == 1){
-            boostIRQflag = 0;
-            //rise edge interrupt
-            __delay_ms(5);
-            if (IP5306_IRQ_PORT == 1){
-                printf("boost 5V on \n");
-                awake();
-            }
-        }
-        
-        if (IP5306_IRQ_PORT == 0){
-            printf("IRQ Low...");
-            if(ip5306_init()){
-                //error = ip5306がOFF
-                printf("BOOST OFF confirm\n");
-                deepSleep();
-                //----- D E E P   S L E E P ------------------------------------
-            
-            }else{
-                //OK = ip5306はオンしていてI2Cの設定ができた
-                printf("iP5306 I2C Ok\n");
-            }
-        }
-*/        
+
         ip5306_ReadStatus();
 
-        
         //printf("interval sleep in \n\n");
         SLEEP();
         //----- INTERVAL SLEEP ---------------
@@ -221,30 +142,14 @@ void mainSwPush(void){
             CLRWDT();                   //ウォッチドックタイマ　クリア 
             printf(".");
             sleep_sw_timer++;
-
-            //if (IP5306_IRQ_PORT == 0){
-            //    //USBアウトの時、長押しでターゲットをオフした時
-            //    BOOST5V_SW_SetLow();        //LCD消灯
-            //    while(MAIN_SW_PUSH){
-            //        //ボタンを離すまで待つ
-            //        CLRWDT();
-            //    }
-            //    __delay_ms(50);
-            //    deepSleep();
-                //----- D E E P   S L E E P ------------------------------------
-
-            //}
-            
             if (sleep_sw_timer > 65){           //3秒
                 //USB-INの時 ---> 充電中なのでiP5306はオンのままインターバルスリープへ
                 //USB-OUTの時 --> スイッチオフ　全停止       
-                    //USB in-outの判定はI2CでOKなのか? 
                 sleepStat = POWERSAVING_SLEEP;
                 intervalSleep();                //インターバルスリープ
                 return;
             }
         }
-
         if (POWERSAVING_SLEEP == sleepStat){
             //USBイン = 充電中の時はターゲットをオンする
             awake();
@@ -258,11 +163,9 @@ void awake(void){
     printf("wake\n");
     sleepStat = POWERSAVING_NORMAL; 
     __delay_ms(1);
-    //ip5306_on();
     BOOST5V_SW_SetHigh();           //5V OUTPUT LoadSwitchオン
     ip5306_init();
     WDTCONbits.SWDTEN = 1;
-    //boostIRQflag = 0;
 }
 
 
@@ -272,24 +175,26 @@ void intervalSleep(void){
     sleepStat = POWERSAVING_SLEEP;
     BOOST5V_SW_SetLow();            //5V OUTPUT LoadSwitchオフ
     WDTCONbits.SWDTEN = 1;
+    CLRWDT();                   //ウォッチドックタイマ　クリア
     printf("\n5V loadSW off\n");    //充電完了待ち状態へ節電
     if (IP5306_IRQ_PORT == 1){
         //boost5V出力中 = USB 5V IN 充電中　
         printf("wait to FullCharge \n");
     }
     printf("\n");
+    __delay_ms(3000);       //WDT 4secよりも長くはできない
 }
 
     
 void deepSleep(void){
     //充電完了時にはPICを完全スリープに
     sleepStat = POWERSAVING_DEEPSLEEP;
+    CLRWDT();                   //ウォッチドックタイマ　クリア
+    WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
     printf("---DEEP SLEEP-----\n");
-    //ip5306_off();
     BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchオフ
     CHARGE_LED_RED_SetLow();
-    WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
-    __delay_ms(500);
+    __delay_ms(100);
     SLEEP();
     //----- D E E P   S L E E P ------------------------------------------------
     
@@ -303,10 +208,8 @@ void deepSleep(void){
 
 //--- RESET -----
 void resetRestart(void){
-    //__delay_ms(200);
     printf("\n");
     printf("***** ReSTART! *****\n");
-    //__delay_ms(500);
     RESET();       //ソフトウエアリセット
     //----- R E S E T   R E S T A R T ------------------------------------------
 }

@@ -138,15 +138,6 @@ bool ip5306_ReadStatus(void){
     uint8_t batLevel;
     uint8_t batPercent = 100;   //%
     static bool    usbinFlag = 0;
-
-    /*
-    if (IP5306_IRQ_PORT == 0){
-       //iP5306 ONの確認
-       printf("BOOST 5V off \n");
-       CHARGE_LED_RED_SetHigh();   //赤LED点灯 -> エラー
-       return ERROR;
-    }
-    */
     
     txData[0] = REG_READ0;
     if (!I2C1_Host.WriteRead(IP5306_SLAVE_ID, txData, 1, rxData, 2)){
@@ -259,14 +250,6 @@ bool ip5306_ReadStatus(void){
     }   //usbinFlag
     
     return OK;
-}
-
-
-void ip5306_reset(void){
-    //iP5306　I2C通信不良の時リセットする
-    ip5306_off();
-    __delay_ms(2);
-    ip5306_on();
 }
 
 
