@@ -11,11 +11,10 @@
 #ifndef _IP5306_H    /* Guard against multiple inclusion */
 #define _IP5306_H
 
+#include "header.h"
+
 
 //Global
-
-
-
 typedef enum
 {
     POWERSAVING_NORMAL = 0,

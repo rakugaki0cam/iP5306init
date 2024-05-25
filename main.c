@@ -29,10 +29,11 @@
   * 2024.02.14  ver.1.10    メインスイッチとiP5306のスイッチを分離
   *                         5306SWcontrol ブランチにてコーディング
   * 2024.02.14  ver.1.11    I2C通信不良の時iP5306のSWを一旦オフしてリセットしてみる
+  * 2024.05.25  ver.1.20    I2Cレベル変換FXMA2102によってiP5306側バッテリ電圧とPICを分ける。
+  *                         PIC側はiP5306出力5Vにつなぎ、電源オフ時にオフになるようにした。
   * 
   * 
   */
- 
 #include "header.h"
 
 
@@ -61,13 +62,13 @@ void iP5306_irq_callback(void){
 void ip5306_on(void){
     //BOOST ON
     IP5306_SW_SetHigh();
-    __delay_ms(10);         //5msec以上
+    __delay_ms(40);         //30msec以上
     IP5306_SW_SetLow();
 }
 
 
 void ip5306_off(void){
-    //BOOST OFF(I2C mode)
+    //BOOST OFF
     IP5306_SW_SetHigh();
     __delay_ms(3200);       //3sec以上
     IP5306_SW_SetLow();
@@ -81,11 +82,11 @@ void ip5306_off(void){
     
     //BOOST OFF(I2Cモードになっていない場合、バッテリ残量LEDモード=異常時)
     IP5306_SW_SetHigh();
-    __delay_ms(10);
+    __delay_ms(40);
     IP5306_SW_SetLow();
     __delay_ms(200);
     IP5306_SW_SetHigh();
-    __delay_ms(10);
+    __delay_ms(40);
     IP5306_SW_SetLow();
     //1sec以内にダブルクリック
 }
@@ -101,7 +102,7 @@ int main(void){
     IP5306_IRQ_SetInterruptHandler(iP5306_irq_callback);
     
     CHARGE_LED_RED_SetHigh();   //LED 赤オン
-    ip5306_on();                //iP5306オン
+    //ip5306_on();                //iP5306オン///////////////
     BOOST5V_SW_SetHigh();       //5V OUTPUT LoadSwitchオン
     
 
@@ -129,13 +130,15 @@ int main(void){
     printf("\n\n");
     printf("******************\n");
     printf(" iP5306 init\n");
-    printf("       2024.02\n");
+    printf("       2024.05\n");
     printf("******************\n");
     printf("\n");
     
     CHARGE_LED_RED_SetLow();   //LED 赤オフ
     while(MAIN_SW_PUSH);
     
+    ip5306_init();
+/*
     if (ip5306_init()){
         //I2C error
         ip5306_reset();
@@ -148,10 +151,12 @@ int main(void){
         }
         
     }
-    
+*/  
     // main loop ------------------------
     while(1){
+/*
         if (boostIRQflag == 1){
+            boostIRQflag = 0;
             //rise edge interrupt
             __delay_ms(5);
             if (IP5306_IRQ_PORT == 1){
@@ -173,7 +178,7 @@ int main(void){
                 printf("iP5306 I2C Ok\n");
             }
         }
-        
+*/        
         ip5306_ReadStatus();
 
         
@@ -188,8 +193,8 @@ int main(void){
         NOP();
         
         if (mainSwFlag){
-            mainSwPush();
             mainSwFlag = 0;
+            mainSwPush();
         }
         
         CLRWDT();                   //ウォッチドックタイマ　クリア 
@@ -221,7 +226,7 @@ void mainSwPush(void){
             //    BOOST5V_SW_SetLow();        //LCD消灯
             //    while(MAIN_SW_PUSH){
             //        //ボタンを離すまで待つ
-                    CLRWDT();
+            //        CLRWDT();
             //    }
             //    __delay_ms(50);
             //    deepSleep();
@@ -251,12 +256,12 @@ void mainSwPush(void){
 void awake(void){
     printf("wake\n");
     sleepStat = POWERSAVING_NORMAL; 
-    __delay_ms(100);
-    ip5306_on();
+    __delay_ms(1);
+    //ip5306_on();
     BOOST5V_SW_SetHigh();           //5V OUTPUT LoadSwitchオン
     ip5306_init();
     WDTCONbits.SWDTEN = 1;
-    boostIRQflag = 0;
+    //boostIRQflag = 0;
 }
 
 
@@ -279,7 +284,7 @@ void deepSleep(void){
     //充電完了時にはPICを完全スリープに
     sleepStat = POWERSAVING_DEEPSLEEP;
     printf("---DEEP SLEEP-----\n");
-    ip5306_off();
+    //ip5306_off();
     BOOST5V_SW_SetLow();        //5V OUTPUT LoadSwitchオフ
     CHARGE_LED_RED_SetLow();
     WDTCONbits.SWDTEN = 0;      //WDTでのスリープ解除なし
@@ -297,10 +302,10 @@ void deepSleep(void){
 
 //--- RESET -----
 void resetRestart(void){
-    __delay_ms(200);
+    //__delay_ms(200);
     printf("\n");
     printf("***** ReSTART! *****\n");
-    __delay_ms(500);
+    //__delay_ms(500);
     RESET();       //ソフトウエアリセット
     //----- R E S E T   R E S T A R T ------------------------------------------
 }

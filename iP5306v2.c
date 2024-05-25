@@ -14,8 +14,6 @@
  * 2024.01.22
  * 
  */
-
-#include "header.h"
 #include "iP5306v2.h"
 
 
@@ -38,9 +36,7 @@
 #define REG_READ2           0x72
 #define REG_READ3           0x77
 #define REG_READ4           0x78
-
-
-
+//
 #define     ERROR   1
 #define     OK      0
 
@@ -143,12 +139,14 @@ bool ip5306_ReadStatus(void){
     uint8_t batPercent = 100;   //%
     static bool    usbinFlag = 0;
 
+    /*
     if (IP5306_IRQ_PORT == 0){
        //iP5306 ONの確認
        printf("BOOST 5V off \n");
        CHARGE_LED_RED_SetHigh();   //赤LED点灯 -> エラー
        return ERROR;
     }
+    */
     
     txData[0] = REG_READ0;
     if (!I2C1_Host.WriteRead(IP5306_SLAVE_ID, txData, 1, rxData, 2)){
